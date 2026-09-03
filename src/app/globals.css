@@ -1,0 +1,82 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #000000;
+    --surface: #f9f9f9;
+    --surface-alt: #f3f3f3;
+    --border: #e5e5e5;
+    --accent-slate: #64748b;
+    --active-green: #22c55e;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+}
+
+/* Micro border utilities */
+.border-micro {
+  border: 1px solid var(--border);
+}
+
+.border-micro-t {
+  border-top: 1px solid var(--border);
+}
+
+.border-micro-b {
+  border-bottom: 1px solid var(--border);
+}
+
+.border-micro-l {
+  border-left: 1px solid var(--border);
+}
+
+.border-micro-r {
+  border-right: 1px solid var(--border);
+}
+
+/* High contrast glassmorphism sheet overlay */
+.sheet-canvas {
+  background-color: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+}
+
+/* Radar pulse animation for driver searching */
+@keyframes radar-pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+.animate-radar {
+  animation: radar-pulse 2s infinite ease-in-out;
+}
+
+/* Custom scrollbar for mobile drawers */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #000000;
+}
