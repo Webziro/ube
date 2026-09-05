@@ -6,9 +6,10 @@ import MapEngine from '@/components/Map/MapEngine';
 import DispatchModal from './DispatchModal';
 import DriverTripPanel from './DriverTripPanel';
 import EarningsWidget from './EarningsWidget';
+import TripCompletedModal from '@/components/User/TripCompletedModal';
 
 export default function RiderDashboard() {
-    const { status, driverIsOnline, tickRiderPosition, simSpeed } = useRideStore();
+    const { status, ratingModalOpen, driverIsOnline, tickRiderPosition, simSpeed } = useRideStore();
 
     // Automatic driver movement simulation loop when trip is active
     useEffect(() => {
@@ -52,6 +53,9 @@ export default function RiderDashboard() {
 
             {/* Dispatch Incoming Notification Modal */}
             {status === 'SEARCHING' && driverIsOnline && <DispatchModal />}
+
+            {/* Ride Completed Notification & Summary Modal */}
+            {ratingModalOpen && <TripCompletedModal />}
         </div>
     );
 }

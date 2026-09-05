@@ -2,21 +2,21 @@
 
 import React, { useEffect } from 'react';
 import Header from '@/components/Header';
-import UserDashboard from '@/components/User/UserDashboard';
+import RiderDashboard from '@/components/Rider/RiderDashboard';
 import { useRideStore } from '@/store/useRideStore';
 
-export default function RiderPage() {
+export default function DriverPage() {
     const { setRole } = useRideStore();
 
     useEffect(() => {
-        setRole('passenger');
+        setRole('driver');
     }, [setRole]);
 
     return (
         <main className="w-screen h-screen flex flex-col overflow-hidden bg-black text-black">
             <Header />
             <div className="flex-1 w-full h-[calc(100vh-3.5rem)] mt-14 relative">
-                <UserDashboard />
+                <RiderDashboard />
             </div>
         </main>
     );

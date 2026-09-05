@@ -1,20 +1,36 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useRideStore } from '@/store/useRideStore';
-import { CheckCircle2, Star, Receipt, ArrowRight, Heart } from 'lucide-react';
+import { useAuthStore } from '@/store/useAuthStore';
+import { CheckCircle2, Star, Receipt, ArrowRight, Heart, History } from 'lucide-react';
 
-export default function TripCompletedModal() {
-    const { lastReceipt, driverProfile, resetState, setRatingModalOpen } = useRideStore();
+interface TripCompletedModalProps {
+    onDismiss?: () => void;
+}
+
+export default function TripCompletedModal({ onDismiss }: TripCompletedModalProps) {
+    const router = useRouter();
+    const { lastReceipt, driverProfile, resetState, setRatingModalOpen, activeRole } = useRideStore();
+    const { currentUser } = useAuthStore();
     const [rating, setRating] = useState<number>(5);
     const [hoverRating, setHoverRating] = useState<number>(0);
     const [selectedTip, setSelectedTip] = useState<number>(500);
 
     if (!lastReceipt) return null;
 
+    const isDriver = activeRole === 'driver' || currentUser?.role === 'driver';
+
     const handleFinish = () => {
+        if (onDismiss) onDismiss();
         setRatingModalOpen(false);
         resetState();
+        if (isDriver) {
+            router.push('/driver/history');
+        } else {
+            router.push('/rider/history');
+        }
     };
 
     return (
@@ -92,8 +108,8 @@ export default function TripCompletedModal() {
                             >
                                 <Star
                                     className={`w-7 h-7 ${(hoverRating || rating) >= star
-                                            ? 'fill-amber-400 text-amber-400'
-                                            : 'text-zinc-300'
+                                        ? 'fill-amber-400 text-amber-400'
+                                        : 'text-zinc-300'
                                         }`}
                                 />
                             </button>
@@ -116,8 +132,8 @@ export default function TripCompletedModal() {
                                 key={tip}
                                 onClick={() => setSelectedTip(tip)}
                                 className={`py-2 text-xs font-mono font-bold rounded border transition-all ${selectedTip === tip
-                                        ? 'bg-black text-white border-black'
-                                        : 'bg-zinc-50 text-black border-zinc-200 hover:border-zinc-400'
+                                    ? 'bg-black text-white border-black'
+                                    : 'bg-zinc-50 text-black border-zinc-200 hover:border-zinc-400'
                                     }`}
                             >
                                 {tip === 0 ? 'No Tip' : `₦${tip}`}
@@ -131,7 +147,8 @@ export default function TripCompletedModal() {
                     onClick={handleFinish}
                     className="w-full py-3.5 bg-black hover:bg-zinc-800 text-white font-mono font-bold uppercase text-xs tracking-wider rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all border border-black mt-2"
                 >
-                    <span>Complete & Done</span>
+                    <History className="w-4 h-4 text-emerald-400" />
+                    <span>View Trip History & Receipt</span>
                     <ArrowRight className="w-4 h-4" />
                 </button>
             </div>

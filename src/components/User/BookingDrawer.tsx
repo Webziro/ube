@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import { useRideStore } from '@/store/useRideStore';
+import { useWalletStore } from '@/store/useWalletStore';
 import { PRESET_LOCATIONS, VEHICLE_OPTIONS } from '@/constants/locations';
 import { apiService } from '@/services/api';
 import { MapPin, Navigation, ArrowRight, Wallet, CreditCard, ChevronDown } from 'lucide-react';
-
 import { useAuthStore } from '@/store/useAuthStore';
 
 export default function BookingDrawer() {
@@ -21,6 +21,8 @@ export default function BookingDrawer() {
         durationMins,
         requestRide,
     } = useRideStore();
+
+    const { balance, paymentMethod, setPaymentMethod, setWalletModalOpen } = useWalletStore();
 
     const handleRequestRide = async () => {
         const { isAuthenticated, setAuthModalOpen } = useAuthStore.getState();
@@ -42,7 +44,6 @@ export default function BookingDrawer() {
 
     const [showPickupList, setShowPickupList] = useState(false);
     const [showDropoffList, setShowDropoffList] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState<'wallet' | 'card'>('wallet');
 
     return (
         <div className="w-full bg-white border-t border-zinc-200 shadow-2xl p-4 sm:p-6 flex flex-col gap-4 max-h-[85vh] overflow-y-auto">
@@ -163,8 +164,8 @@ export default function BookingDrawer() {
                                 key={tier.id}
                                 onClick={() => setSelectedTier(tier.id)}
                                 className={`p-3 text-left border rounded-lg transition-all flex flex-col justify-between ${isSelected
-                                    ? 'border-2 border-black bg-black text-white shadow-md'
-                                    : 'border-zinc-200 bg-zinc-50 hover:border-zinc-400 text-black'
+                                        ? 'border-2 border-black bg-black text-white shadow-md'
+                                        : 'border-zinc-200 bg-zinc-50 hover:border-zinc-400 text-black'
                                     }`}
                             >
                                 <div className="flex justify-between items-start">
@@ -185,7 +186,9 @@ export default function BookingDrawer() {
                                     </span>
                                 </div>
                                 <div
-                                    className={`text-[10px] mt-2 flex items-center justify-between border-t pt-1.5 ${isSelected ? 'border-zinc-800 text-zinc-400' : 'border-zinc-200 text-zinc-500'
+                                    className={`text-[10px] mt-2 flex items-center justify-between border-t pt-1.5 ${isSelected
+                                            ? 'border-zinc-800 text-zinc-400'
+                                            : 'border-zinc-200 text-zinc-500'
                                         }`}
                                 >
                                     <span>{tier.etaMinutes} mins away</span>
@@ -199,20 +202,22 @@ export default function BookingDrawer() {
 
             {/* Payment Selection & Confirm Button */}
             <div className="flex items-center gap-3 pt-2">
-                <div className="flex bg-zinc-100 p-1 border border-zinc-200 rounded shrink-0">
+                <div className="flex items-center bg-zinc-100 p-1 border border-zinc-200 rounded shrink-0 gap-1">
                     <button
                         onClick={() => setPaymentMethod('wallet')}
-                        className={`p-2 rounded transition-all ${paymentMethod === 'wallet' ? 'bg-black text-white' : 'text-zinc-500'
+                        className={`flex items-center gap-1 px-2.5 py-1.5 rounded transition-all text-xs font-mono font-bold ${paymentMethod === 'wallet' ? 'bg-black text-white' : 'text-zinc-600 hover:text-black'
                             }`}
-                        title="Ube Wallet"
+                        title="UBE Wallet"
                     >
-                        <Wallet className="w-4 h-4" />
+                        <Wallet className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>₦{balance.toLocaleString()}</span>
                     </button>
+
                     <button
-                        onClick={() => setPaymentMethod('card')}
-                        className={`p-2 rounded transition-all ${paymentMethod === 'card' ? 'bg-black text-white' : 'text-zinc-500'
+                        onClick={() => setPaymentMethod('paystack')}
+                        className={`p-1.5 rounded transition-all ${paymentMethod === 'paystack' ? 'bg-black text-white' : 'text-zinc-500 hover:text-black'
                             }`}
-                        title="Card Payment"
+                        title="Paystack Direct Card/Transfer"
                     >
                         <CreditCard className="w-4 h-4" />
                     </button>
@@ -220,10 +225,10 @@ export default function BookingDrawer() {
 
                 <button
                     onClick={handleRequestRide}
-                    className="flex-1 py-3.5 px-6 bg-black text-white hover:bg-zinc-800 font-mono font-bold uppercase text-sm tracking-wider rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all border border-black active:scale-[0.99]"
+                    className="flex-1 py-3.5 px-4 bg-black text-white hover:bg-zinc-800 font-mono font-bold uppercase text-xs sm:text-sm tracking-wider rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all border border-black active:scale-[0.99]"
                 >
                     <span>Request {selectedTier}</span>
-                    <span className="bg-white/20 px-2 py-0.5 rounded text-xs">
+                    <span className="bg-white/20 px-2 py-0.5 rounded text-xs font-black">
                         ₦{estimatedFare.toLocaleString()}
                     </span>
                     <ArrowRight className="w-4 h-4" />

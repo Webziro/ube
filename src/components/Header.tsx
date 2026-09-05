@@ -1,137 +1,157 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useRideStore } from '@/store/useRideStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { apiService } from '@/services/api';
 import ProfileMenu from '@/components/Auth/ProfileMenu';
 import AuthModal from '@/components/Auth/AuthModal';
-import { User, Car, Columns, RotateCcw, FastForward, Radio } from 'lucide-react';
+import WalletModal from '@/components/Wallet/WalletModal';
+import { Car, Globe, HelpCircle, ClipboardList, ChevronDown } from 'lucide-react';
 
 export default function Header() {
-    const { activeRole, setRole, status, resetState, simSpeed, setSimSpeed, driverIsOnline } =
-        useRideStore();
+    const router = useRouter();
+    const { activeRole, setRole, resetState } = useRideStore();
+    const { isAuthenticated, setAuthModalOpen } = useAuthStore();
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        // Initialize Real-Time SSE Gateway for cross-client stream syncing
+        setMounted(true);
+        const { isAuthenticated } = useAuthStore.getState();
+        if (!isAuthenticated) {
+            fetch('/api/rides/active', { method: 'DELETE' }).catch(() => { });
+            useRideStore.getState().resetState();
+        }
         apiService.initRealtimeGateway();
     }, []);
 
     return (
         <>
-            <header className="fixed top-0 left-0 right-0 z-30 h-14 bg-black text-white px-3 sm:px-4 flex items-center justify-between shadow-md border-b border-zinc-800">
-                {/* Brand logo & role indicator */}
-                <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="flex items-center gap-2 cursor-pointer">
-                        <span className="font-mono text-xl font-black tracking-tighter text-white bg-white/10 px-2 py-0.5 border border-white/20">
-                            UBE
-                        </span>
-                        <span className="text-[10px] font-mono tracking-widest uppercase text-zinc-400 hidden lg:inline-block border-l border-zinc-700 pl-2">
-                            Seamless Mobility
-                        </span>
-                    </div>
+            <header className="fixed top-0 left-0 right-0 z-30 h-16 bg-white text-black px-4 lg:px-8 flex items-center justify-between border-b border-zinc-200 shadow-sm font-sans">
+                {/* LEFT: Uber Brand & Standard Navigation Links */}
+                <div className="flex items-center gap-8 h-full">
+                    {/* Brand Logo */}
+                    <Link
+                        href="/"
+                        onClick={() => {
+                            if (!isAuthenticated) {
+                                resetState();
+                            }
+                        }}
+                        className="text-2xl font-black tracking-tight text-black hover:opacity-80 transition"
+                    >
+                        Uber
+                    </Link>
 
-                    {/* Status Badge */}
-                    <div className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 px-2 py-1 rounded text-xs">
-                        <span
-                            className={`w-2 h-2 rounded-full ${status === 'IDLE'
-                                ? 'bg-emerald-500'
-                                : status === 'SEARCHING'
-                                    ? 'bg-amber-400 animate-ping'
-                                    : status === 'COMPLETED'
-                                        ? 'bg-blue-400'
-                                        : 'bg-emerald-400 animate-pulse'
-                                }`}
-                        />
-                        <span className="font-mono text-[10px] uppercase font-bold tracking-wider text-zinc-300">
-                            {status}
-                        </span>
-                    </div>
-
-                    {/* Real-time Gateway Active Indicator */}
-                    <div className="hidden xl:flex items-center gap-1 text-[10px] font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-800/60 px-1.5 py-0.5 rounded">
-                        <Radio className="w-3 h-3 animate-pulse text-emerald-400" />
-                        <span>STAGE 7 GATEWAY LIVE</span>
-                    </div>
-                </div>
-
-                {/* Role, Profile & Controls */}
-                <div className="flex items-center gap-2">
-                    {/* Sim Speed Toggle */}
-                    <div className="hidden md:flex items-center gap-1 bg-zinc-900 border border-zinc-800 rounded px-1.5 py-0.5">
-                        <FastForward className="w-3.5 h-3.5 text-zinc-400" />
-                        <span className="text-[10px] font-mono text-zinc-400">SPEED:</span>
-                        {[1, 3, 5].map((speed) => (
+                    {/* Navbar Links for Unauthenticated vs Authenticated */}
+                    {!isAuthenticated ? (
+                        <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-zinc-800">
+                            <Link href="/rider" className="hover:text-black transition-colors">
+                                Ride
+                            </Link>
+                            <Link href="/driver" className="hover:text-black transition-colors">
+                                Earn
+                            </Link>
+                            <a href="#business" className="hover:text-black transition-colors">
+                                Business
+                            </a>
+                            <a href="#eats" className="hover:text-black transition-colors">
+                                Uber Eats
+                            </a>
+                            <div className="relative group cursor-pointer flex items-center gap-1 hover:text-black transition-colors">
+                                <span>About</span>
+                                <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />
+                            </div>
+                        </nav>
+                    ) : (
+                        /* Authenticated Active Tabs (Matching Screenshot 1) */
+                        <nav className="flex items-center gap-6 h-full">
                             <button
-                                key={speed}
-                                onClick={() => setSimSpeed(speed)}
-                                className={`px-1.5 py-0.5 text-[10px] font-mono rounded transition-colors ${simSpeed === speed
-                                    ? 'bg-white text-black font-bold'
-                                    : 'text-zinc-400 hover:text-white'
+                                onClick={() => {
+                                    setRole('passenger');
+                                    router.push('/rider');
+                                }}
+                                className={`flex items-center gap-2 h-full border-b-2 font-bold text-sm transition-all px-1 ${activeRole === 'passenger'
+                                        ? 'border-black text-black'
+                                        : 'border-transparent text-zinc-500 hover:text-black'
                                     }`}
                             >
-                                {speed}x
+                                <Car className="w-4 h-4" />
+                                <span>Ride</span>
                             </button>
-                        ))}
-                    </div>
 
-                    {/* View mode switcher tabs */}
-                    <div className="flex bg-zinc-900 border border-zinc-800 rounded p-0.5">
-                        <button
-                            onClick={() => setRole('passenger')}
-                            className={`flex items-center gap-1 px-2.5 py-1 text-xs font-mono rounded transition-all ${activeRole === 'passenger'
-                                ? 'bg-white text-black font-bold shadow-sm'
-                                : 'text-zinc-400 hover:text-white'
-                                }`}
-                            title="Passenger Booking Screen"
-                        >
-                            <User className="w-3.5 h-3.5" />
-                            <span className="hidden sm:inline">Passenger</span>
-                        </button>
+                            <button
+                                onClick={() => {
+                                    setRole('driver');
+                                    router.push('/driver');
+                                }}
+                                className={`flex items-center gap-2 h-full border-b-2 font-bold text-sm transition-all px-1 ${activeRole === 'driver'
+                                        ? 'border-black text-black'
+                                        : 'border-transparent text-zinc-500 hover:text-black'
+                                    }`}
+                            >
+                                <span>Earn / Driver</span>
+                            </button>
+                        </nav>
+                    )}
+                </div>
 
-                        <button
-                            onClick={() => setRole('driver')}
-                            className={`flex items-center gap-1 px-2.5 py-1 text-xs font-mono rounded transition-all ${activeRole === 'driver'
-                                ? 'bg-white text-black font-bold shadow-sm'
-                                : 'text-zinc-400 hover:text-white'
-                                }`}
-                            title="Driver Dispatch App"
-                        >
-                            <Car className="w-3.5 h-3.5" />
-                            <span className="hidden sm:inline">Driver</span>
-                            {driverIsOnline && (
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                            )}
-                        </button>
+                {/* RIGHT: EN, Help, Activity & Auth Profile */}
+                <div className="flex items-center gap-3">
+                    {!isAuthenticated ? (
+                        <>
+                            {/* Language Selector */}
+                            <button className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-800 hover:bg-zinc-100 rounded-full transition">
+                                <Globe className="w-4 h-4 text-zinc-500" />
+                                <span>EN</span>
+                            </button>
 
-                        <button
-                            onClick={() => setRole('split')}
-                            className={`flex items-center gap-1 px-2.5 py-1 text-xs font-mono rounded transition-all ${activeRole === 'split'
-                                ? 'bg-white text-black font-bold shadow-sm'
-                                : 'text-zinc-400 hover:text-white'
-                                }`}
-                            title="Dual View (Side-by-side simulation)"
-                        >
-                            <Columns className="w-3.5 h-3.5" />
-                            <span className="hidden md:inline">Dual View</span>
-                        </button>
-                    </div>
+                            {/* Help Link */}
+                            <button className="hidden sm:flex items-center gap-1 px-3 py-2 text-xs font-semibold text-zinc-800 hover:bg-zinc-100 rounded-full transition">
+                                <HelpCircle className="w-4 h-4 text-zinc-500" />
+                                <span>Help</span>
+                            </button>
 
-                    {/* Profile & Auth Menu */}
-                    <ProfileMenu />
+                            {/* Log in Button */}
+                            <button
+                                onClick={() => setAuthModalOpen(true, 'login', 'passenger')}
+                                className="px-4 py-2 text-xs font-semibold text-black hover:bg-zinc-100 rounded-full transition-colors"
+                            >
+                                Log in
+                            </button>
 
-                    {/* Reset State button */}
-                    <button
-                        onClick={resetState}
-                        className="p-1.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
-                        title="Reset Simulation State"
-                    >
-                        <RotateCcw className="w-4 h-4" />
-                    </button>
+                            {/* Sign up Button */}
+                            <button
+                                onClick={() => setAuthModalOpen(true, 'register', 'passenger')}
+                                className="px-4 py-2 text-xs font-bold bg-black text-white hover:bg-zinc-800 rounded-full transition-colors shadow-sm"
+                            >
+                                Sign up
+                            </button>
+                        </>
+                    ) : (
+                        /* Authenticated Right Actions (Matching Screenshot 1) */
+                        <div className="flex items-center gap-3">
+                            {/* Activity Pill Button (Matching Screenshot 1 top-right) */}
+                            <Link
+                                href={activeRole === 'driver' ? '/driver/history' : '/rider/history'}
+                                className="flex items-center gap-1.5 bg-zinc-100 hover:bg-zinc-200 text-black px-4 py-2 rounded-full text-xs font-bold transition-all"
+                            >
+                                <ClipboardList className="w-4 h-4 text-black" />
+                                <span>Activity</span>
+                            </Link>
+
+                            {/* Profile Dropdown Menu */}
+                            {mounted && <ProfileMenu />}
+                        </div>
+                    )}
                 </div>
             </header>
 
-            {/* Global Auth Modal */}
+            {/* Global Modals */}
             <AuthModal />
+            <WalletModal />
         </>
     );
 }

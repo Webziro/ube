@@ -59,7 +59,24 @@ class RideStateServerManager {
     ];
 
     public getActiveRide(): RideSessionServer | null {
+        if (!this.activeRide) return null;
+        const terminalStatuses: string[] = ['CANCELLED', 'COMPLETED', 'IDLE'];
+        if (terminalStatuses.includes(this.activeRide.status)) {
+            this.activeRide = null;
+            return null;
+        }
         return this.activeRide;
+    }
+
+    public forceReset(): void {
+        if (this.activeRide) {
+            const rideId = this.activeRide.id;
+            this.activeRide = null;
+            this.broadcast('RIDE_CANCELLED', { rideId, forced: true });
+        } else {
+            // Broadcast even if no ride so clients reset to IDLE
+            this.broadcast('RIDE_CANCELLED', { rideId: null, forced: true });
+        }
     }
 
     public getNearbyDrivers() {
@@ -125,13 +142,13 @@ class RideStateServerManager {
     }
 
     public acceptDispatch(rideId: string, driverId: string): RideSessionServer | null {
-        if (!this.activeRide || this.activeRide.id !== rideId) return null;
+        if (!this.activeRide || (rideId !== 'active' && this.activeRide.id !== rideId)) return null;
         this.activeRide.status = 'ACCEPTED';
         this.activeRide.driverId = driverId;
         this.activeRide.updatedAt = new Date().toISOString();
         this.broadcast('DISPATCH_ACCEPTED', this.activeRide);
 
-        // Async update in MongoDB
+        const currentId = this.activeRide.id;
         (async () => {
             try {
                 const { connectToDatabase } = await import('@/lib/mongodb');
@@ -139,7 +156,7 @@ class RideStateServerManager {
                 if (conn) {
                     const { RideModel } = await import('@/models/Ride');
                     await RideModel.updateOne(
-                        { id: rideId },
+                        { id: currentId },
                         { $set: { status: 'ACCEPTED', driverId, updatedAt: new Date() } }
                     );
                 }
@@ -152,7 +169,7 @@ class RideStateServerManager {
     }
 
     public updateRideStatus(rideId: string, status: RideStatus, driverLoc?: { lat: number; lng: number }): RideSessionServer | null {
-        if (!this.activeRide || this.activeRide.id !== rideId) return null;
+        if (!this.activeRide || (rideId !== 'active' && this.activeRide.id !== rideId)) return null;
         this.activeRide.status = status;
         if (driverLoc) {
             this.activeRide.driverLocation = driverLoc;
@@ -172,8 +189,12 @@ class RideStateServerManager {
         }
 
         this.broadcast('RIDE_STATUS_UPDATED', this.activeRide);
+        const savedRide = { ...this.activeRide };
 
-        // Async update in MongoDB
+        if (status === 'CANCELLED' || status === 'IDLE') {
+            this.activeRide = null;
+        }
+
         (async () => {
             try {
                 const { connectToDatabase } = await import('@/lib/mongodb');
@@ -181,8 +202,8 @@ class RideStateServerManager {
                 if (conn) {
                     const { RideModel } = await import('@/models/Ride');
                     await RideModel.updateOne(
-                        { id: rideId },
-                        { $set: { status, driverLocation: this.activeRide?.driverLocation, receipt: this.activeRide?.receipt, updatedAt: new Date() } }
+                        { id: savedRide.id },
+                        { $set: { status, driverLocation: savedRide.driverLocation, receipt: savedRide.receipt, updatedAt: new Date() } }
                     );
                 }
             } catch (err) {
@@ -190,21 +211,21 @@ class RideStateServerManager {
             }
         })();
 
-        return this.activeRide;
+        return savedRide;
     }
 
     public updateDriverLocation(rideId: string, lat: number, lng: number, heading: number) {
-        if (this.activeRide && this.activeRide.id === rideId) {
+        if (this.activeRide && (rideId === 'active' || this.activeRide.id === rideId)) {
             this.activeRide.driverLocation = { lat, lng };
             this.activeRide.driverHeading = heading;
-            this.broadcast('DRIVER_LOCATION_TICK', { rideId, lat, lng, heading });
+            this.broadcast('DRIVER_LOCATION_TICK', { rideId: this.activeRide.id, lat, lng, heading });
         }
     }
 
     public cancelRide(rideId: string) {
-        if (this.activeRide && this.activeRide.id === rideId) {
+        if (this.activeRide && (rideId === 'active' || this.activeRide.id === rideId)) {
             this.activeRide.status = 'CANCELLED';
-            this.broadcast('RIDE_CANCELLED', { rideId });
+            this.broadcast('RIDE_CANCELLED', { rideId: this.activeRide.id });
             const currentId = this.activeRide.id;
             this.activeRide = null;
 
