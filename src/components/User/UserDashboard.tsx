@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRideStore } from '@/store/useRideStore';
 import { useWalletStore } from '@/store/useWalletStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import MapEngine from '@/components/Map/MapEngine';
+import UberLandingPage from '@/components/Landing/UberLandingPage';
 import BookingDrawer from './BookingDrawer';
 import SearchingOverlay from './SearchingOverlay';
 import TripActiveDrawer from './TripActiveDrawer';
@@ -17,7 +18,6 @@ import {
     Search as SearchIcon,
     Key,
     Sparkles,
-    ArrowLeft,
     Plus as PlusIcon,
     Minus as MinusIcon,
 } from 'lucide-react';
@@ -31,11 +31,9 @@ export default function UserDashboard() {
         dropoff,
         setDropoff,
         pinCode,
-        resetState,
         requestRide,
     } = useRideStore();
-    const { balance, setWalletModalOpen } = useWalletStore();
-    const { currentUser, isAuthenticated, setAuthModalOpen } = useAuthStore();
+    const { isAuthenticated, setAuthModalOpen } = useAuthStore();
 
     // Local form state for "Get a ride" widget (Screenshot 1)
     const [pickupQuery, setPickupQuery] = useState(pickup.name || 'Current Location');
@@ -75,10 +73,20 @@ export default function UserDashboard() {
         setShowOptions(true);
     };
 
+    // ─── 1. WHEN LOGGED OUT: SHOW FULL LANDING PAGE ───
+    if (!isAuthenticated) {
+        return (
+            <UberLandingPage
+                onStartBooking={() => setAuthModalOpen(true, 'login', 'passenger')}
+            />
+        );
+    }
+
+    // ─── 2. WHEN LOGGED IN: SHOW BOOKING PAGE (SCREENSHOT 1 MATCH) ───
     return (
         <div className="w-full h-[calc(100vh-4rem)] bg-white overflow-hidden font-sans text-black flex flex-col p-4 md:p-6 lg:p-8">
             <div className="max-w-7xl w-full mx-auto flex-1 grid grid-cols-1 md:grid-cols-12 gap-6 h-full items-stretch">
-                {/* ─── LEFT: "Get a ride" Card (Matching Screenshot 1) ─── */}
+                {/* LEFT: "Get a ride" Card (Matching Screenshot 1) */}
                 <div className="md:col-span-5 lg:col-span-4 flex flex-col gap-4 z-10">
                     <div className="bg-white border border-zinc-200/80 rounded-3xl p-6 shadow-xl flex flex-col gap-4">
                         <h2 className="text-3xl font-black text-black tracking-tight">
@@ -125,7 +133,6 @@ export default function UserDashboard() {
 
                         {/* Selectors Row (Pickup now ▾ & For me ▾) */}
                         <div className="flex items-center gap-2 pt-1">
-                            {/* Pickup time dropdown */}
                             <button
                                 onClick={() =>
                                     setPickupTime(
@@ -139,7 +146,6 @@ export default function UserDashboard() {
                                 <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />
                             </button>
 
-                            {/* Passenger dropdown */}
                             <button
                                 onClick={() =>
                                     setPassengerFor(
@@ -154,7 +160,7 @@ export default function UserDashboard() {
                             </button>
                         </div>
 
-                        {/* Search CTA Button (Matching Screenshot 1) */}
+                        {/* Search CTA Button */}
                         <button
                             onClick={handleSearchRide}
                             className="w-full py-3.5 bg-black hover:bg-zinc-800 text-white font-bold text-sm rounded-2xl transition shadow-lg mt-2 flex items-center justify-center gap-2"
@@ -176,9 +182,8 @@ export default function UserDashboard() {
                     )}
                 </div>
 
-                {/* ─── RIGHT: Map Canvas with Rounded Corners (Matching Screenshot 1) ─── */}
+                {/* RIGHT: Map Canvas with Rounded Corners */}
                 <div className="md:col-span-7 lg:col-span-8 relative rounded-3xl overflow-hidden border border-zinc-200/80 shadow-lg min-h-[400px] h-full">
-                    {/* Leaflet Map Engine */}
                     <div className="absolute inset-0 z-0">
                         <MapEngine interactive={true} />
                     </div>
@@ -206,7 +211,7 @@ export default function UserDashboard() {
                         </div>
                     )}
 
-                    {/* Stacked Floating Zoom Controls (+) (-) bottom-right matching Screenshot 1 */}
+                    {/* Stacked Floating Zoom Controls (+) (-) bottom-right */}
                     <div className="absolute bottom-6 right-6 z-10 flex flex-col bg-white border border-zinc-200 rounded-xl shadow-xl overflow-hidden font-bold">
                         <button
                             onClick={() => alert('Zoom in')}
