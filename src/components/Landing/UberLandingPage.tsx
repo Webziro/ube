@@ -53,7 +53,7 @@ export default function UberLandingPage({ onStartBooking }: UberLandingPageProps
 
     return (
         <div className="w-full h-full overflow-y-auto bg-black text-white selection:bg-white selection:text-black">
-            {/* 1. UBER-STYLE HERO SECTION */}
+            {/* 1. UBE-STYLE HERO SECTION */}
             <div className="relative min-h-[85vh] w-full bg-zinc-950 flex flex-col justify-between border-b border-zinc-800 pt-16">
                 {/* Hero Background Glow & Grid Pattern */}
                 <div className="absolute inset-0 bg-[radial-gradient(#333333_1px,transparent_1px)] [background-size:32px_32px] opacity-25 pointer-events-none" />
@@ -62,7 +62,7 @@ export default function UberLandingPage({ onStartBooking }: UberLandingPageProps
                 {/* Hero Main Grid Container */}
                 <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-8 pb-16 relative z-10 flex-1 flex flex-col justify-center">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                        {/* LEFT COLUMN: Uber Hero Booking Widget */}
+                        {/* LEFT COLUMN: Ube Hero Booking Widget */}
                         <div className="lg:col-span-6 space-y-6">
                             {/* Service Tabs */}
                             <div className="inline-flex bg-zinc-900 p-1 rounded-2xl border border-zinc-800">
@@ -260,7 +260,7 @@ export default function UberLandingPage({ onStartBooking }: UberLandingPageProps
                 </div>
             </div>
 
-            {/* 2. EXPLORE WHAT YOU CAN DO WITH UBE (EXACT UBER SECTION FROM USER IMAGE) */}
+            {/* 2. EXPLORE WHAT YOU CAN DO WITH UBE (EXACT UBE SECTION FROM USER IMAGE) */}
             <div className="py-20 bg-zinc-950 border-b border-zinc-800">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
                     <div className="space-y-2">

@@ -111,7 +111,7 @@ export default function ProfileMenu() {
                         <button
                             onClick={() => {
                                 setDropdownOpen(false);
-                                alert('Uber Help Center');
+                                alert('Ube Help Center');
                             }}
                             className="bg-zinc-100 hover:bg-zinc-200 rounded-2xl p-3 flex flex-col items-center justify-center gap-1.5 transition text-black font-bold text-xs"
                         >
@@ -140,7 +140,7 @@ export default function ProfileMenu() {
                         </Link>
                     </div>
 
-                    {/* Uber Cash Balance Card (Matching Screenshot 2) */}
+                    {/* Ube Cash Balance Card (Matching Screenshot 2) */}
                     <div
                         onClick={() => {
                             setDropdownOpen(false);
@@ -148,7 +148,7 @@ export default function ProfileMenu() {
                         }}
                         className="bg-zinc-100 hover:bg-zinc-200/80 rounded-2xl p-4 flex items-center justify-between cursor-pointer transition my-3"
                     >
-                        <span className="text-sm font-semibold text-black">Uber Cash</span>
+                        <span className="text-sm font-semibold text-black">Ube Cash</span>
                         <span className="text-base font-bold text-black">
                             NGN {balance.toFixed(2)}
                         </span>

@@ -30,7 +30,7 @@ export default function Header() {
     return (
         <>
             <header className="fixed top-0 left-0 right-0 z-30 h-16 bg-white text-black px-4 lg:px-8 flex items-center justify-between border-b border-zinc-200 shadow-sm font-sans">
-                {/* LEFT: Uber Brand & Standard Navigation Links */}
+                {/* LEFT: Ube Brand & Standard Navigation Links */}
                 <div className="flex items-center gap-8 h-full">
                     {/* Brand Logo */}
                     <Link
@@ -42,7 +42,7 @@ export default function Header() {
                         }}
                         className="text-2xl font-black tracking-tight text-black hover:opacity-80 transition"
                     >
-                        Uber
+                        Ube
                     </Link>
 
                     {/* Navbar Links for Unauthenticated vs Authenticated */}
@@ -58,7 +58,7 @@ export default function Header() {
                                 Business
                             </a>
                             <a href="#eats" className="hover:text-black transition-colors">
-                                Uber Eats
+                                Ube Foods
                             </a>
                             <div className="relative group cursor-pointer flex items-center gap-1 hover:text-black transition-colors">
                                 <span>About</span>

@@ -91,12 +91,12 @@ export default function AuthModal() {
                 <div className="p-6 flex items-center justify-between border-b border-zinc-100">
                     <div>
                         <div className="text-2xl font-black tracking-tight text-black">
-                            Uber
+                            Ube
                         </div>
                         <p className="text-xs text-zinc-500 mt-1">
                             {tab === 'login'
                                 ? 'Welcome back! Sign in to your account'
-                                : 'Create your Uber account'}
+                                : 'Create your Ube account'}
                         </p>
                     </div>
 
