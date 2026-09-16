@@ -1,6 +1,7 @@
 import { LocationPoint, VehicleOption } from '@/types/ride';
 
 export const PRESET_LOCATIONS: LocationPoint[] = [
+    // Lagos Hub Locations
     {
         name: 'Victoria Island (Eko Atlantic)',
         address: 'Ahmadu Bello Way, Victoria Island, Lagos',
@@ -20,22 +21,35 @@ export const PRESET_LOCATIONS: LocationPoint[] = [
         lng: 3.3582,
     },
     {
-        name: 'Yaba Tech Hub',
-        address: 'Herbert Macaulay Way, Yaba, Lagos',
-        lat: 6.5095,
-        lng: 3.3711,
-    },
-    {
         name: 'Murtala Muhammed Airport (MM2)',
         address: 'Local Airport Rd, Ikeja, Lagos',
         lat: 6.5774,
         lng: 3.3332,
     },
+    // Abuja Hub Locations
     {
-        name: 'Ikoyi Golf Club',
-        address: '19 Golf Course Rd, Ikoyi, Lagos',
-        lat: 6.4523,
-        lng: 3.4358,
+        name: 'Wuse II Central',
+        address: 'Aminu Kano Crescent, Wuse II, Abuja FCT',
+        lat: 9.0765,
+        lng: 7.4764,
+    },
+    {
+        name: 'Maitama District',
+        address: 'Aguiyi Ironsi St, Maitama, Abuja FCT',
+        lat: 9.0882,
+        lng: 7.4983,
+    },
+    {
+        name: 'Nnamdi Azikiwe Airport (ABV)',
+        address: 'Airport Road, Abuja FCT',
+        lat: 9.0068,
+        lng: 7.2631,
+    },
+    {
+        name: 'Jabi Lake Mall',
+        address: 'Bala Sokoto Way, Jabi, Abuja FCT',
+        lat: 9.0784,
+        lng: 7.4251,
     },
 ];
 
@@ -44,8 +58,8 @@ export const VEHICLE_OPTIONS: VehicleOption[] = [
         id: 'Ube Go',
         name: 'Ube Go',
         tag: 'Popular & Fast',
-        baseFare: 1500,
-        perKmRate: 250,
+        baseFare: 350,
+        perKmRate: 150,
         etaMinutes: 3,
         capacity: 4,
         description: 'Affordable everyday rides in compact hatchbacks & sedans.',
@@ -54,8 +68,8 @@ export const VEHICLE_OPTIONS: VehicleOption[] = [
         id: 'Ube Comfort',
         name: 'Ube Comfort',
         tag: 'Top Rated Drivers',
-        baseFare: 2500,
-        perKmRate: 350,
+        baseFare: 650,
+        perKmRate: 180,
         etaMinutes: 5,
         capacity: 4,
         description: 'Spacious sedans with extra legroom & high-rated drivers.',
@@ -64,8 +78,8 @@ export const VEHICLE_OPTIONS: VehicleOption[] = [
         id: 'Ube Exec',
         name: 'Ube Exec',
         tag: 'Premium Luxury',
-        baseFare: 4500,
-        perKmRate: 600,
+        baseFare: 1100,
+        perKmRate: 200,
         etaMinutes: 7,
         capacity: 4,
         description: 'Luxury executive sedans (Mercedes, BMW, Lexus) with VIP service.',
@@ -74,8 +88,8 @@ export const VEHICLE_OPTIONS: VehicleOption[] = [
         id: 'Ube XL',
         name: 'Ube XL',
         tag: 'Groups & Luggage',
-        baseFare: 5000,
-        perKmRate: 650,
+        baseFare: 1500,
+        perKmRate: 250,
         etaMinutes: 6,
         capacity: 6,
         description: 'Full-size SUVs & vans for up to 6 passengers or extra luggage.',

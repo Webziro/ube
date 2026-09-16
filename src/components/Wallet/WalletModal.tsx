@@ -156,8 +156,8 @@ export default function WalletModal() {
                                         setCustomAmount('');
                                     }}
                                     className={`py-2 px-3 rounded-xl border text-xs font-mono font-bold transition ${amount === preset && !customAmount
-                                            ? 'bg-white text-black border-white'
-                                            : 'bg-zinc-900 text-zinc-300 border-zinc-800 hover:border-zinc-700'
+                                        ? 'bg-white text-black border-white'
+                                        : 'bg-zinc-900 text-zinc-300 border-zinc-800 hover:border-zinc-700'
                                         }`}
                                 >
                                     ₦{preset.toLocaleString()}
@@ -174,6 +174,15 @@ export default function WalletModal() {
                                 placeholder="Custom amount"
                                 value={customAmount}
                                 onChange={(e) => setCustomAmount(e.target.value)}
+                                onFocus={(e) => {
+                                    e.target.dataset.placeholder = e.target.placeholder;
+                                    e.target.placeholder = '';
+                                }}
+                                onBlur={(e) => {
+                                    if (e.target.dataset.placeholder) {
+                                        e.target.placeholder = e.target.dataset.placeholder;
+                                    }
+                                }}
                                 className="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-2.5 pl-7 pr-3 text-xs text-white font-mono focus:outline-none focus:border-white transition"
                             />
                         </div>
@@ -209,8 +218,8 @@ export default function WalletModal() {
                                         <div className="flex items-center gap-2.5">
                                             <div
                                                 className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${tx.type === 'CREDIT'
-                                                        ? 'bg-emerald-950 text-emerald-400'
-                                                        : 'bg-zinc-800 text-zinc-300'
+                                                    ? 'bg-emerald-950 text-emerald-400'
+                                                    : 'bg-zinc-800 text-zinc-300'
                                                     }`}
                                             >
                                                 {tx.type === 'CREDIT' ? (

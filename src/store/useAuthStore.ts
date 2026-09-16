@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { UserProfile, UserRoleType, AuthSession, LoginPayload, RegisterPayload } from '@/types/auth';
+import { UserProfile, UserRoleType, AuthSession, LoginPayload, RegisterPayload, VehicleInfo } from '@/types/auth';
 
 // Mock default users for quick switching/testing
 export const MOCK_PASSENGER: UserProfile = {
@@ -33,7 +33,7 @@ export const MOCK_DRIVER_USER: UserProfile = {
         model: 'Camry Hybrid',
         color: 'Onyx Black',
         plate: 'LAG-849-XY',
-        tier: 'Ube Comfort',
+        tier: 'Ube Comfort' as VehicleInfo['tier'],
     },
 };
 
@@ -119,8 +119,8 @@ export const useAuthStore = create<AuthStoreState>()(
                     const newUser: UserProfile = {
                         id: `usr_${Date.now()}`,
                         name: payload.name,
-                        email: payload.email,
-                        phone: payload.phone,
+                        email: payload.email || `${payload.role}@ube.ng`,
+                        phone: payload.phone || '+234 800 000 0000',
                         role: payload.role,
                         avatar: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250`,
                         rating: 5.0,
@@ -131,7 +131,15 @@ export const useAuthStore = create<AuthStoreState>()(
                         earnings: payload.role === 'driver' ? 0 : undefined,
                     };
                     set({
-                        currentUser: newUser,
+                        currentUser: {
+                            ...newUser,
+                            vehicle: newUser.vehicle
+                                ? {
+                                    ...newUser.vehicle,
+                                    tier: newUser.vehicle.tier as VehicleInfo['tier'],
+                                }
+                                : undefined,
+                        },
                         token: `ube_jwt_mock_${newUser.id}`,
                         isAuthenticated: true,
                         authModalOpen: false,

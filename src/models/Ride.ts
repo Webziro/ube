@@ -88,5 +88,9 @@ const RideSchema = new Schema<IRide>(
     }
 );
 
+RideSchema.index({ passengerId: 1, status: 1 });
+RideSchema.index({ driverId: 1, status: 1 });
+RideSchema.index({ status: 1 });
+
 export const RideModel: Model<IRide> =
     (mongoose.models.Ride as Model<IRide>) || mongoose.model<IRide>('Ride', RideSchema);

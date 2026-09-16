@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRideStore } from '@/store/useRideStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { apiService } from '@/services/api';
 import {
     Navigation,
@@ -13,6 +14,7 @@ import {
     Play,
     ArrowRight,
     ShieldCheck,
+    Lock,
 } from 'lucide-react';
 
 export default function DriverTripPanel() {
@@ -28,10 +30,21 @@ export default function DriverTripPanel() {
         simSpeed,
     } = useRideStore();
 
+    const { isAuthenticated, setAuthModalOpen } = useAuthStore();
     const [enteredPin, setEnteredPin] = useState('');
     const [pinError, setPinError] = useState(false);
 
+    const checkDriverAuth = (): boolean => {
+        if (!isAuthenticated) {
+            setAuthModalOpen(true, 'login', 'driver');
+            return false;
+        }
+        return true;
+    };
+
     const handleVerifyPinAndStart = async () => {
+        if (!checkDriverAuth()) return;
+
         if (enteredPin.trim() === pinCode || enteredPin === '4892' || enteredPin.length === 4) {
             setPinError(false);
             await apiService.updateStatus('IN_TRIP');
@@ -42,17 +55,34 @@ export default function DriverTripPanel() {
     };
 
     const handleDriverArrived = async () => {
+        if (!checkDriverAuth()) return;
         await apiService.updateStatus('ARRIVED_AT_PICKUP');
         driverArrived();
     };
 
     const handleCompleteTrip = async () => {
+        if (!checkDriverAuth()) return;
         await apiService.updateStatus('COMPLETED');
         completeTrip();
     };
 
     return (
         <div className="w-full bg-white border-t border-zinc-200 shadow-2xl p-5 flex flex-col gap-4">
+            {!isAuthenticated && (
+                <div className="bg-amber-50 border border-amber-300 p-2.5 rounded-lg flex items-center justify-between text-xs font-mono text-amber-900">
+                    <div className="flex items-center gap-2">
+                        <Lock className="w-4 h-4 text-amber-600 shrink-0" />
+                        <span>Logged out: Sign in to verify PIN & complete trip</span>
+                    </div>
+                    <button
+                        onClick={() => setAuthModalOpen(true, 'login', 'driver')}
+                        className="px-2.5 py-1 bg-black text-white font-bold rounded text-[11px] uppercase"
+                    >
+                        Sign In
+                    </button>
+                </div>
+            )}
+
             {/* Active Step Indicator */}
             <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
                 <div>
@@ -94,13 +124,19 @@ export default function DriverTripPanel() {
 
                 <div className="flex items-center gap-2">
                     <button
-                        onClick={() => alert('Calling Passenger...')}
+                        onClick={() => {
+                            if (!checkDriverAuth()) return;
+                            alert('Calling Passenger...');
+                        }}
                         className="p-2 rounded bg-black text-white hover:bg-zinc-800 transition-colors"
                     >
                         <Phone className="w-3.5 h-3.5" />
                     </button>
                     <button
-                        onClick={() => alert('Messaging Passenger...')}
+                        onClick={() => {
+                            if (!checkDriverAuth()) return;
+                            alert('Messaging Passenger...');
+                        }}
                         className="p-2 rounded bg-zinc-200 text-black hover:bg-zinc-300 transition-colors"
                     >
                         <MessageSquare className="w-3.5 h-3.5" />

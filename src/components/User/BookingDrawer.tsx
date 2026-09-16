@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRideStore } from '@/store/useRideStore';
 import { useWalletStore } from '@/store/useWalletStore';
 import { PRESET_LOCATIONS, VEHICLE_OPTIONS } from '@/constants/locations';
+import { calculateDynamicFare, detectCityFromLocation } from '@/constants/pricing';
 import { apiService } from '@/services/api';
 import { MapPin, Navigation, ArrowRight, Wallet, CreditCard, ChevronDown } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -145,6 +146,9 @@ export default function BookingDrawer() {
                 <div>
                     DISTANCE: <span className="font-bold text-black">{distanceKm} km</span>
                 </div>
+                <div className="flex items-center gap-1 bg-black text-white px-2 py-0.5 rounded text-[10px] font-bold">
+                    📍 {detectCityFromLocation(pickup)} Hub
+                </div>
                 <div>
                     EST. TIME: <span className="font-bold text-black">{durationMins} mins</span>
                 </div>
@@ -152,20 +156,21 @@ export default function BookingDrawer() {
 
             {/* Vehicle Tier Options */}
             <div className="flex flex-col gap-2">
-                <div className="text-[11px] font-mono uppercase font-bold text-zinc-500 tracking-wider">
-                    Choose Ride Option
+                <div className="flex justify-between items-center text-[11px] font-mono uppercase font-bold text-zinc-500 tracking-wider">
+                    <span>Choose Ride Option</span>
+                    <span className="text-[10px] text-zinc-400 font-normal">Location-based pricing active</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {VEHICLE_OPTIONS.map((tier) => {
                         const isSelected = selectedTier === tier.id;
-                        const fare = Math.round((tier.baseFare + distanceKm * tier.perKmRate) / 100) * 100;
+                        const fare = calculateDynamicFare(tier.id, distanceKm, durationMins, pickup);
                         return (
                             <button
                                 key={tier.id}
                                 onClick={() => setSelectedTier(tier.id)}
                                 className={`p-3 text-left border rounded-lg transition-all flex flex-col justify-between ${isSelected
-                                        ? 'border-2 border-black bg-black text-white shadow-md'
-                                        : 'border-zinc-200 bg-zinc-50 hover:border-zinc-400 text-black'
+                                    ? 'border-2 border-black bg-black text-white shadow-md'
+                                    : 'border-zinc-200 bg-zinc-50 hover:border-zinc-400 text-black'
                                     }`}
                             >
                                 <div className="flex justify-between items-start">
@@ -187,8 +192,8 @@ export default function BookingDrawer() {
                                 </div>
                                 <div
                                     className={`text-[10px] mt-2 flex items-center justify-between border-t pt-1.5 ${isSelected
-                                            ? 'border-zinc-800 text-zinc-400'
-                                            : 'border-zinc-200 text-zinc-500'
+                                        ? 'border-zinc-800 text-zinc-400'
+                                        : 'border-zinc-200 text-zinc-500'
                                         }`}
                                 >
                                     <span>{tier.etaMinutes} mins away</span>
@@ -229,7 +234,7 @@ export default function BookingDrawer() {
                 >
                     <span>Request {selectedTier}</span>
                     <span className="bg-white/20 px-2 py-0.5 rounded text-xs font-black">
-                        ₦{estimatedFare.toLocaleString()}
+                        ₦{calculateDynamicFare(selectedTier, distanceKm, durationMins, pickup).toLocaleString()}
                     </span>
                     <ArrowRight className="w-4 h-4" />
                 </button>

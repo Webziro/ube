@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { rideServerManager } from '@/lib/rideStateServer';
+import { calculateDynamicFare } from '@/constants/pricing';
 
 export async function POST(request: Request) {
     try {
@@ -13,13 +14,17 @@ export async function POST(request: Request) {
             );
         }
 
+        const dist = distanceKm || 5.2;
+        const duration = Math.round(dist * 3.5);
+        const validatedFare = estimatedFare || calculateDynamicFare(selectedTier, dist, duration, pickup);
+
         const ride = rideServerManager.createRideRequest({
             passengerId: passengerId || 'usr_pass_001',
             pickup,
             dropoff,
             selectedTier,
-            estimatedFare: estimatedFare || 2500,
-            distanceKm: distanceKm || 5.2,
+            estimatedFare: validatedFare,
+            distanceKm: dist,
         });
 
         return NextResponse.json({

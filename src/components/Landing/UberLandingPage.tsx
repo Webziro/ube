@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRideStore } from '@/store/useRideStore';
 import { useWalletStore } from '@/store/useWalletStore';
+import { calculateDynamicFare } from '@/constants/pricing';
 import {
     Car,
     MapPin,
@@ -69,8 +70,8 @@ export default function UberLandingPage({ onStartBooking }: UberLandingPageProps
                                 <button
                                     onClick={() => setActiveTab('ride')}
                                     className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono text-xs font-bold transition-all ${activeTab === 'ride'
-                                            ? 'bg-white text-black shadow-lg'
-                                            : 'text-zinc-400 hover:text-white'
+                                        ? 'bg-white text-black shadow-lg'
+                                        : 'text-zinc-400 hover:text-white'
                                         }`}
                                 >
                                     <Car className="w-4 h-4" />
@@ -79,8 +80,8 @@ export default function UberLandingPage({ onStartBooking }: UberLandingPageProps
                                 <button
                                     onClick={() => setActiveTab('drive')}
                                     className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono text-xs font-bold transition-all ${activeTab === 'drive'
-                                            ? 'bg-white text-black shadow-lg'
-                                            : 'text-zinc-400 hover:text-white'
+                                        ? 'bg-white text-black shadow-lg'
+                                        : 'text-zinc-400 hover:text-white'
                                         }`}
                                 >
                                     <DollarSign className="w-4 h-4 text-emerald-400" />
@@ -89,8 +90,8 @@ export default function UberLandingPage({ onStartBooking }: UberLandingPageProps
                                 <button
                                     onClick={() => setActiveTab('package')}
                                     className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono text-xs font-bold transition-all ${activeTab === 'package'
-                                            ? 'bg-white text-black shadow-lg'
-                                            : 'text-zinc-400 hover:text-white'
+                                        ? 'bg-white text-black shadow-lg'
+                                        : 'text-zinc-400 hover:text-white'
                                         }`}
                                 >
                                     <Sparkles className="w-4 h-4 text-amber-400" />
@@ -121,6 +122,17 @@ export default function UberLandingPage({ onStartBooking }: UberLandingPageProps
                                             type="text"
                                             value={pickupInput}
                                             onChange={(e) => setPickupInput(e.target.value)}
+                                            onFocus={(e) => {
+                                                setPickupInput('');
+                                                e.target.dataset.placeholder = e.target.placeholder;
+                                                e.target.placeholder = '';
+                                            }}
+                                            onClick={() => setPickupInput('')}
+                                            onBlur={(e) => {
+                                                if (e.target.dataset.placeholder) {
+                                                    e.target.placeholder = e.target.dataset.placeholder;
+                                                }
+                                            }}
                                             placeholder="Enter pickup location"
                                             className="w-full pl-10 pr-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-white transition"
                                             required
@@ -137,6 +149,17 @@ export default function UberLandingPage({ onStartBooking }: UberLandingPageProps
                                             type="text"
                                             value={dropoffInput}
                                             onChange={(e) => setDropoffInput(e.target.value)}
+                                            onFocus={(e) => {
+                                                setDropoffInput('');
+                                                e.target.dataset.placeholder = e.target.placeholder;
+                                                e.target.placeholder = '';
+                                            }}
+                                            onClick={() => setDropoffInput('')}
+                                            onBlur={(e) => {
+                                                if (e.target.dataset.placeholder) {
+                                                    e.target.placeholder = e.target.dataset.placeholder;
+                                                }
+                                            }}
                                             placeholder="Enter destination"
                                             className="w-full pl-10 pr-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-white transition"
                                             required
@@ -217,7 +240,9 @@ export default function UberLandingPage({ onStartBooking }: UberLandingPageProps
                                             </div>
                                         </div>
                                         <div className="text-right font-mono">
-                                            <div className="text-sm font-bold text-emerald-400">₦2,500</div>
+                                            <div className="text-sm font-bold text-emerald-400">
+                                                ₦{calculateDynamicFare('Ube Go', 5.2, 18, pickup).toLocaleString()}
+                                            </div>
                                             <div className="text-[10px] text-zinc-500">Upfront fare</div>
                                         </div>
                                     </div>
@@ -233,7 +258,9 @@ export default function UberLandingPage({ onStartBooking }: UberLandingPageProps
                                             </div>
                                         </div>
                                         <div className="text-right font-mono">
-                                            <div className="text-sm font-bold text-emerald-400">₦3,800</div>
+                                            <div className="text-sm font-bold text-emerald-400">
+                                                ₦{calculateDynamicFare('Ube Comfort', 5.2, 18, pickup).toLocaleString()}
+                                            </div>
                                             <div className="text-[10px] text-zinc-500">Upfront fare</div>
                                         </div>
                                     </div>
@@ -249,7 +276,9 @@ export default function UberLandingPage({ onStartBooking }: UberLandingPageProps
                                             </div>
                                         </div>
                                         <div className="text-right font-mono">
-                                            <div className="text-sm font-bold text-emerald-400">₦6,200</div>
+                                            <div className="text-sm font-bold text-emerald-400">
+                                                ₦{calculateDynamicFare('Ube Exec', 5.2, 18, pickup).toLocaleString()}
+                                            </div>
                                             <div className="text-[10px] text-zinc-500">Upfront fare</div>
                                         </div>
                                     </div>

@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRideStore } from '@/store/useRideStore';
-import { Phone, MessageSquare, ShieldAlert, Star, Car, Key, MapPin, CheckCircle2 } from 'lucide-react';
+import { Phone, MessageSquare, ShieldAlert, Star, Car, Key, MapPin, CheckCircle2, Copy, Check } from 'lucide-react';
 
 export default function TripActiveDrawer() {
     const {
@@ -14,6 +14,16 @@ export default function TripActiveDrawer() {
         estimatedFare,
         cancelRide,
     } = useRideStore();
+
+    const [copied, setCopied] = useState(false);
+
+    const handleCopyPin = () => {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(pinCode);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
 
     const getStatusText = () => {
         switch (status) {
@@ -64,7 +74,7 @@ export default function TripActiveDrawer() {
                 </div>
             </div>
 
-            {/* Safety PIN Verification Card */}
+            {/* Safety PIN Verification Card with Clipboard Copy Button */}
             <div className="bg-zinc-950 text-white p-3.5 rounded-lg flex items-center justify-between border border-zinc-800 shadow-inner">
                 <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-zinc-800 flex items-center justify-center text-white border border-zinc-700">
@@ -77,8 +87,27 @@ export default function TripActiveDrawer() {
                         <div className="text-xs text-zinc-300">Share PIN with driver before starting trip</div>
                     </div>
                 </div>
-                <div className="font-mono text-xl font-black tracking-widest bg-white text-black px-3 py-1 rounded border border-white">
-                    {pinCode}
+                <div className="flex items-center gap-2">
+                    <div className="font-mono text-xl font-black tracking-widest bg-white text-black px-3 py-1 rounded border border-white">
+                        {pinCode}
+                    </div>
+                    <button
+                        onClick={handleCopyPin}
+                        className="p-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded border border-zinc-600 transition flex items-center gap-1 font-mono text-xs"
+                        title="Copy PIN code"
+                    >
+                        {copied ? (
+                            <>
+                                <Check className="w-4 h-4 text-emerald-400" />
+                                <span className="text-[10px] text-emerald-400 font-bold">COPIED</span>
+                            </>
+                        ) : (
+                            <>
+                                <Copy className="w-4 h-4 text-zinc-300" />
+                                <span className="text-[10px] text-zinc-300">COPY</span>
+                            </>
+                        )}
+                    </button>
                 </div>
             </div>
 

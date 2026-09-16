@@ -60,9 +60,6 @@ class ApiService {
                         const data = await res.json();
                         if (data.success && data.ride) {
                             this.syncRideFromServer(data.ride);
-                        } else if (data.success && !data.ride && clientStatus === 'SEARCHING') {
-                            // Only reset if client is stuck in SEARCHING and server has nothing
-                            useRideStore.getState().resetState();
                         }
                     }
                 } catch (e) {

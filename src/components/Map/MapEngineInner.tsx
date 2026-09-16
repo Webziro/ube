@@ -76,7 +76,7 @@ function MapClickHandler({ isSelectingPickup }: { isSelectingPickup: boolean }) 
     return null;
 }
 
-// Component to auto fit map bounds whenever points change
+// Component to auto fit map bounds whenever destination points or status change
 function MapBoundsManager() {
     const map = useMap();
     const { pickup, dropoff, driverLocation, status } = useRideStore();
@@ -93,7 +93,9 @@ function MapBoundsManager() {
 
         const bounds = L.latLngBounds(points);
         map.fitBounds(bounds, { padding: [60, 60], maxZoom: 15, animate: true });
-    }, [map, pickup, dropoff, driverLocation.lat, driverLocation.lng, status]);
+        // Only re-fit bounds on initial mount, status change, or pickup/dropoff coordinate change
+        // DO NOT include driverLocation.lat/lng to prevent continuous map shaking on animation ticks
+    }, [map, pickup.lat, pickup.lng, dropoff.lat, dropoff.lng, status]);
 
     return null;
 }

@@ -172,6 +172,15 @@ export default function ChooseRiderModal({
                                 type="text"
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
+                                onFocus={(e) => {
+                                    e.target.dataset.placeholder = e.target.placeholder;
+                                    e.target.placeholder = '';
+                                }}
+                                onBlur={(e) => {
+                                    if (e.target.dataset.placeholder) {
+                                        e.target.placeholder = e.target.dataset.placeholder;
+                                    }
+                                }}
                                 placeholder="Enter first name"
                                 className="w-full p-3.5 bg-zinc-100 rounded-xl border-none font-medium text-sm text-black focus:outline-none focus:ring-2 focus:ring-black"
                                 required
@@ -185,6 +194,15 @@ export default function ChooseRiderModal({
                                 type="text"
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
+                                onFocus={(e) => {
+                                    e.target.dataset.placeholder = e.target.placeholder;
+                                    e.target.placeholder = '';
+                                }}
+                                onBlur={(e) => {
+                                    if (e.target.dataset.placeholder) {
+                                        e.target.placeholder = e.target.dataset.placeholder;
+                                    }
+                                }}
                                 placeholder="Enter last name"
                                 className="w-full p-3.5 bg-zinc-100 rounded-xl border-none font-medium text-sm text-black focus:outline-none focus:ring-2 focus:ring-black"
                                 required
@@ -212,6 +230,15 @@ export default function ChooseRiderModal({
                                         type="tel"
                                         value={phoneDigits}
                                         onChange={(e) => setPhoneDigits(e.target.value)}
+                                        onFocus={(e) => {
+                                            e.target.dataset.placeholder = e.target.placeholder;
+                                            e.target.placeholder = '';
+                                        }}
+                                        onBlur={(e) => {
+                                            if (e.target.dataset.placeholder) {
+                                                e.target.placeholder = e.target.dataset.placeholder;
+                                            }
+                                        }}
                                         placeholder="Phone number"
                                         className="w-full bg-transparent text-sm font-medium text-black focus:outline-none"
                                         required

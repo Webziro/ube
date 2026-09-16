@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRideStore } from '@/store/useRideStore';
 import { useAuthStore } from '@/store/useAuthStore';
-import { CheckCircle2, Star, Receipt, ArrowRight, Heart, History } from 'lucide-react';
+import { CheckCircle2, Star, Receipt, ArrowRight, Heart, History, X } from 'lucide-react';
 
 interface TripCompletedModalProps {
     onDismiss?: () => void;
@@ -22,10 +22,14 @@ export default function TripCompletedModal({ onDismiss }: TripCompletedModalProp
 
     const isDriver = activeRole === 'driver' || currentUser?.role === 'driver';
 
-    const handleFinish = () => {
+    const handleCloseModal = () => {
         if (onDismiss) onDismiss();
         setRatingModalOpen(false);
         resetState();
+    };
+
+    const handleFinish = () => {
+        handleCloseModal();
         if (isDriver) {
             router.push('/driver/history');
         } else {
@@ -35,9 +39,18 @@ export default function TripCompletedModal({ onDismiss }: TripCompletedModalProp
 
     return (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white border-2 border-black max-w-md w-full rounded-xl shadow-2xl p-6 flex flex-col gap-5 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-200">
+            <div className="bg-white border-2 border-black max-w-md w-full rounded-xl shadow-2xl p-6 flex flex-col gap-5 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-200 relative">
+                {/* Close / Cancel Button */}
+                <button
+                    onClick={handleCloseModal}
+                    className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-black hover:bg-zinc-100 rounded-full transition"
+                    title="Close modal"
+                >
+                    <X className="w-5 h-5" />
+                </button>
+
                 {/* Animated Checkmark Header */}
-                <div className="flex flex-col items-center text-center gap-2">
+                <div className="flex flex-col items-center text-center gap-2 pt-2">
                     <div className="w-16 h-16 rounded-full bg-black text-white flex items-center justify-center shadow-lg">
                         <CheckCircle2 className="w-9 h-9 text-emerald-400" />
                     </div>
@@ -142,15 +155,23 @@ export default function TripCompletedModal({ onDismiss }: TripCompletedModalProp
                     </div>
                 </div>
 
-                {/* Done CTA */}
-                <button
-                    onClick={handleFinish}
-                    className="w-full py-3.5 bg-black hover:bg-zinc-800 text-white font-mono font-bold uppercase text-xs tracking-wider rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all border border-black mt-2"
-                >
-                    <History className="w-4 h-4 text-emerald-400" />
-                    <span>View Trip History & Receipt</span>
-                    <ArrowRight className="w-4 h-4" />
-                </button>
+                {/* Done CTA Buttons */}
+                <div className="flex flex-col gap-2 mt-2">
+                    <button
+                        onClick={handleFinish}
+                        className="w-full py-3.5 bg-black hover:bg-zinc-800 text-white font-mono font-bold uppercase text-xs tracking-wider rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all border border-black"
+                    >
+                        <History className="w-4 h-4 text-emerald-400" />
+                        <span>View Trip History & Receipt</span>
+                        <ArrowRight className="w-4 h-4" />
+                    </button>
+                    <button
+                        onClick={handleCloseModal}
+                        className="w-full py-2.5 bg-zinc-100 hover:bg-zinc-200 text-black font-mono font-bold text-xs uppercase rounded-lg border border-zinc-300 transition-all text-center"
+                    >
+                        Close Window
+                    </button>
+                </div>
             </div>
         </div>
     );

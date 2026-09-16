@@ -8,6 +8,7 @@ import {
     TripReceipt,
 } from '@/types/ride';
 import { PRESET_LOCATIONS, VEHICLE_OPTIONS, MOCK_DRIVER } from '@/constants/locations';
+import { calculateDynamicFare } from '@/constants/pricing';
 
 // Helper to calculate distance in KM between two lat/lng points using Haversine formula
 export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -35,10 +36,14 @@ export function calculateHeading(lat1: number, lon1: number, lat2: number, lon2:
     return (brng + 360) % 360;
 }
 
-export function calculateFare(tierId: VehicleTier, distanceKm: number): number {
-    const option = VEHICLE_OPTIONS.find((v) => v.id === tierId) || VEHICLE_OPTIONS[0];
-    const total = option.baseFare + Math.max(1, distanceKm) * option.perKmRate;
-    return Math.round(total / 100) * 100; // Round to nearest 100 NGN
+export function calculateFare(
+    tierId: VehicleTier,
+    distanceKm: number,
+    durationMins?: number,
+    location?: LocationPoint
+): number {
+    const duration = durationMins ?? Math.round(distanceKm * 3.5);
+    return calculateDynamicFare(tierId, distanceKm, duration, location);
 }
 
 interface RideStoreState {
@@ -108,15 +113,19 @@ const INITIAL_DRIVER_LOC = {
     lng: 3.4112,
 };
 
-const defaultPickup = PRESET_LOCATIONS[0]; // Victoria Island
-const defaultDropoff = PRESET_LOCATIONS[1]; // Lekki Phase 1
-const defaultDistance = calculateDistance(
-    defaultPickup.lat,
-    defaultPickup.lng,
-    defaultDropoff.lat,
-    defaultDropoff.lng
-);
-const defaultFare = calculateFare('Ube Go', defaultDistance);
+const emptyPickup: LocationPoint = {
+    lat: 6.4281,
+    lng: 3.4219,
+    name: '',
+    address: '',
+};
+
+const emptyDropoff: LocationPoint = {
+    lat: 6.4474,
+    lng: 3.4723,
+    name: '',
+    address: '',
+};
 
 export const useRideStore = create<RideStoreState>((set, get) => {
     // Broadcast helper to notify other open tabs
@@ -133,12 +142,12 @@ export const useRideStore = create<RideStoreState>((set, get) => {
     return {
         status: 'IDLE',
         activeRole: 'passenger',
-        pickup: defaultPickup,
-        dropoff: defaultDropoff,
+        pickup: emptyPickup,
+        dropoff: emptyDropoff,
         selectedTier: 'Ube Go',
-        estimatedFare: defaultFare,
-        distanceKm: defaultDistance,
-        durationMins: Math.round(defaultDistance * 3.5),
+        estimatedFare: 0,
+        distanceKm: 0,
+        durationMins: 0,
 
         driverLocation: INITIAL_DRIVER_LOC,
         driverHeading: 45,
@@ -161,11 +170,12 @@ export const useRideStore = create<RideStoreState>((set, get) => {
         setPickup: (loc) => {
             const { dropoff, selectedTier } = get();
             const dist = calculateDistance(loc.lat, loc.lng, dropoff.lat, dropoff.lng);
-            const fare = calculateFare(selectedTier, dist);
+            const duration = Math.round(dist * 3.5);
+            const fare = calculateFare(selectedTier, dist, duration, loc);
             const updates = {
                 pickup: loc,
                 distanceKm: dist,
-                durationMins: Math.round(dist * 3.5),
+                durationMins: duration,
                 estimatedFare: fare,
             };
             set(updates);
@@ -175,11 +185,12 @@ export const useRideStore = create<RideStoreState>((set, get) => {
         setDropoff: (loc) => {
             const { pickup, selectedTier } = get();
             const dist = calculateDistance(pickup.lat, pickup.lng, loc.lat, loc.lng);
-            const fare = calculateFare(selectedTier, dist);
+            const duration = Math.round(dist * 3.5);
+            const fare = calculateFare(selectedTier, dist, duration, pickup);
             const updates = {
                 dropoff: loc,
                 distanceKm: dist,
-                durationMins: Math.round(dist * 3.5),
+                durationMins: duration,
                 estimatedFare: fare,
             };
             set(updates);
@@ -187,8 +198,8 @@ export const useRideStore = create<RideStoreState>((set, get) => {
         },
 
         setSelectedTier: (tier) => {
-            const { distanceKm } = get();
-            const fare = calculateFare(tier, distanceKm);
+            const { distanceKm, durationMins, pickup } = get();
+            const fare = calculateFare(tier, distanceKm, durationMins, pickup);
             const updates = { selectedTier: tier, estimatedFare: fare };
             set(updates);
             broadcastStateChange(updates);

@@ -37,7 +37,9 @@ export interface LoginPayload {
 export interface RegisterPayload {
     name: string;
     email: string;
-    phone: string;
+    phone?: string;
+    password?: string;
+    pin?: string;
     role: UserRoleType;
     vehicle?: VehicleInfo;
 }

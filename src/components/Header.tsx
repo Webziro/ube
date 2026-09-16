@@ -48,11 +48,13 @@ export default function Header() {
                     {/* Navbar Links for Unauthenticated vs Authenticated */}
                     {!isAuthenticated ? (
                         <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-zinc-800">
-                            <Link href="/rider" className="hover:text-black transition-colors">
-                                Ride
-                            </Link>
+                            {activeRole !== 'driver' && (
+                                <Link href="/rider" className="hover:text-black transition-colors">
+                                    Ride
+                                </Link>
+                            )}
                             <Link href="/driver" className="hover:text-black transition-colors">
-                                Earn
+                                Earn / Driver
                             </Link>
                             <a href="#business" className="hover:text-black transition-colors">
                                 Business
@@ -66,34 +68,30 @@ export default function Header() {
                             </div>
                         </nav>
                     ) : (
-                        /* Authenticated Active Tabs (Matching Screenshot 1) */
+                        /* Authenticated Active Tabs - Isolated per user role */
                         <nav className="flex items-center gap-6 h-full">
-                            <button
-                                onClick={() => {
-                                    setRole('passenger');
-                                    router.push('/rider');
-                                }}
-                                className={`flex items-center gap-2 h-full border-b-2 font-bold text-sm transition-all px-1 ${activeRole === 'passenger'
-                                        ? 'border-black text-black'
-                                        : 'border-transparent text-zinc-500 hover:text-black'
-                                    }`}
-                            >
-                                <Car className="w-4 h-4" />
-                                <span>Ride</span>
-                            </button>
-
-                            <button
-                                onClick={() => {
-                                    setRole('driver');
-                                    router.push('/driver');
-                                }}
-                                className={`flex items-center gap-2 h-full border-b-2 font-bold text-sm transition-all px-1 ${activeRole === 'driver'
-                                        ? 'border-black text-black'
-                                        : 'border-transparent text-zinc-500 hover:text-black'
-                                    }`}
-                            >
-                                <span>Earn / Driver</span>
-                            </button>
+                            {(useAuthStore.getState().currentUser?.role === 'driver' || activeRole === 'driver') ? (
+                                <button
+                                    onClick={() => {
+                                        setRole('driver');
+                                        router.push('/driver');
+                                    }}
+                                    className="flex items-center gap-2 h-full border-b-2 border-black font-bold text-sm text-black px-1"
+                                >
+                                    <span>Driver Console</span>
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => {
+                                        setRole('passenger');
+                                        router.push('/');
+                                    }}
+                                    className="flex items-center gap-2 h-full border-b-2 border-black font-bold text-sm text-black px-1"
+                                >
+                                    <Car className="w-4 h-4" />
+                                    <span>Ride</span>
+                                </button>
+                            )}
                         </nav>
                     )}
                 </div>
